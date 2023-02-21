@@ -1,20 +1,16 @@
 // Import required modules
 const express = require("express");
 const path = require("path");
-const mysql = require("mysql")
+const Pool = require('pg').Pool
 const app = express();
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '1234',
-    database: 'world'
-});
-
-// connection.connect((err) => {
-//     if (err) throw err;
-//     console.log('Connected to MySQL Server!');
-// });
+const pool = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'postgres',
+  password: '0512',
+  port: 5432,
+})
 
 // Use EJS as template engine
 app.set("view engine", "ejs");
@@ -23,13 +19,30 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "static")));
 
 // Home route
-app.get("/", async (req, res) => {
-    await connection.query('SELECT * from country LIMIT 50', (err, rows) => {
+app.get("/", (req, res) => {
+    pool.query('SELECT * from country LIMIT 50', (err, response) => {
         if(err) throw err;
+        const rows = response.rows
         console.log('The data from users table are: \n', rows.length);
         res.render('index', { data: rows });
     });
 });
+
+app.get('/search', async (req, res) => {
+    console.log(req.query.q);
+    const search_string = req.query.q;
+    pool.query(`SELECT * from country where name LIKE '%${search_string}%'`, (err, response) => {
+        if(err) throw err;
+        const rows = response.rows
+        console.log('The data from users table are: \n', rows.length);
+        if(rows.length === 0){
+            res.render('nodata', { message: `No data matching ${search_string}` })
+        }
+        else{
+            res.render('index', { data: rows });
+        }
+    });
+})
 
 // Listen to server
 app.listen(3000, () => {

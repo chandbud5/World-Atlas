@@ -10,10 +10,10 @@
 <body>
     <h2 class="materialize-red-text">List of countries</h2>
     <div class="row">
-        <form class="col s12" action="" method="post">  
+        <form class="col s12" action="/search" method="get">  
             <div class="row">
                 <div class="input-field col s12">
-                    <input id="last_name" type="text" name="query" class="validate">
+                    <input id="last_name" type="text" name="q" class="validate">
                     <label for="last_name">Search</label>
                 </div>
             </div>
@@ -34,9 +34,9 @@
             <tbody>
                 <% for (let i = 0; i < data.length; i++) { %>
                     <tr>
-                        <td><%= data[i].Name %></td>
-                        <td><%= data[i].Continent %></td>
-                        <td><%= data[i].Region %></td>
+                        <td><%= data[i].name %></td>
+                        <td><%= data[i].continent %></td>
+                        <td><%= data[i].region %></td>
                     </tr>
                 <% } %>
             </tbody>
