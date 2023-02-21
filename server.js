@@ -1,17 +1,14 @@
 // Import required modules
+require('dotenv').config()
 const express = require("express");
 const path = require("path");
 const Pool = require('pg').Pool
 const app = express();
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'postgres',
-  password: '0512',
-  port: 5432,
+    connectionString: process.env.PG_CONNECTION_STRING,
+    keepAlive:true,
 })
-
 // Use EJS as template engine
 app.set("view engine", "ejs");
 
@@ -20,7 +17,7 @@ app.use(express.static(path.join(__dirname, "static")));
 
 // Home route
 app.get("/", (req, res) => {
-    pool.query('SELECT * from country LIMIT 50', (err, response) => {
+    pool.query('SELECT * from country', (err, response) => {
         if(err) throw err;
         const rows = response.rows
         console.log('The data from users table are: \n', rows.length);
