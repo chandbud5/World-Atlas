@@ -3,6 +3,7 @@ require('dotenv').config()
 const express = require("express");
 const path = require("path");
 const Pool = require('pg').Pool
+const helmet = require('helmet');
 const app = express();
 
 const pool = new Pool({
@@ -14,6 +15,15 @@ app.set("view engine", "ejs");
 
 // Adding static resources
 app.use(express.static(path.join(__dirname, "static")));
+
+// Enable the contentSecurityPolicy middleware
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'"],
+    styleSrc: ["'self'"]
+  }
+}));
 
 // Home route
 app.get("/", (req, res) => {
@@ -28,7 +38,7 @@ app.get("/", (req, res) => {
 app.get('/search', async (req, res) => {
     console.log(req.query.q);
     const search_string = req.query.q;
-    pool.query(`SELECT * from country where name LIKE '%${search_string}%'`, (err, response) => {
+    pool.query(`SELECT * from country where "Name" LIKE '%${search_string}%'`, (err, response) => {
         if(err) throw err;
         const rows = response.rows
         console.log('The data from users table are: \n', rows.length);
